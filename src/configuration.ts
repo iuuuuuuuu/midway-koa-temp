@@ -5,18 +5,31 @@ import * as info from '@midwayjs/info';
 import { join } from 'path';
 import { DefaultErrorFilter } from './filter/default.filter';
 // import { NotFoundFilter } from './filter/notfound.filter';
+import { ValidateErrorFilter } from './filter/validate.filter';
 import { ReportMiddleware } from './middleware/report.middleware';
 import * as crossDomain from '@midwayjs/cross-domain';
 import * as redis from '@midwayjs/redis';
 import * as typegoose from '@midwayjs/typegoose';
+import * as axios from '@midwayjs/axios';
+import * as swagger from '@midwayjs/swagger';
+import * as bull from '@midwayjs/bull';
+import * as staticFile from '@midwayjs/static-file';
+import * as captcha from '@midwayjs/captcha';
 
 @Configuration({
+  // 启用类名冲突检查
+  conflictCheck: true,
   imports: [
     koa,
     validate,
     crossDomain,
     redis,
+    axios,
+    swagger,
     typegoose,
+    bull,
+    staticFile,
+    captcha,
     {
       component: info,
       enabledEnvironment: ['local'],
@@ -35,6 +48,7 @@ export class ContainerLifeCycle {
     this.app.useFilter([
       // NotFoundFilter,
       DefaultErrorFilter,
+      ValidateErrorFilter,
     ]);
   }
 }

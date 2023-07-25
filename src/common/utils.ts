@@ -1,21 +1,57 @@
 import { Provide, Inject } from '@midwayjs/core';
-import axios from 'axios';
 import * as Crypto from 'crypto';
 import { Context } from 'koa';
+import { HttpService } from '@midwayjs/axios';
+import { User } from '../entity/user';
+import { RedisService } from '@midwayjs/redis';
 
 @Provide()
 export default class Utils {
   @Inject()
-  axios: typeof axios;
+  httpService: HttpService;
+  @Inject()
+  redisService: RedisService;
+  
+
+  /**
+   * @description: 创建token
+   */
+  async CreateToken(User: User, n = 1) {
+    const username = User.username;
+    const sk = this.md5(
+      username + Date.now() + Math.ceil(Math.random() * 1000 + n)
+    );
+    this.redisService.set(
+      `SESSION:${sk}`,
+      JSON.stringify(User),
+      'EX',
+      60 * 60 * 24 * 1
+    );
+    return {
+      User,
+      sk,
+    };
+  }
+  /**
+   * @description: 获取token
+   */
+  async GetToken(sk: string) {
+    let result = await this.redisService.get(`SESSION:${sk}`);
+    try {
+      result = JSON.parse(result);
+    } catch (error) {}
+    return result;
+  }
 
   async getIpInfo(ip: string) {
-    const { data } = (await this.axios({
-      url: `https://qifu-api.baidubce.com/ip/geo/v1/district`,
-      method: 'GET',
-      params: {
-        ip,
-      },
-    })) as ipResponse;
+    const { data } = (await this.httpService.get(
+      `https://qifu-api.baidubce.com/ip/geo/v1/district`,
+      {
+        params: {
+          ip,
+        },
+      }
+    )) as ipResponse;
     return data;
   }
   /**

@@ -4,8 +4,8 @@ import { RedisService } from '@midwayjs/redis';
 import { Context } from '@midwayjs/koa';
 import { RESCODE, RESMESSAGE } from '../constant/global';
 import Utils from '../common/utils';
-import { User } from '../entity/user';
 import UserService from '../service/user.service';
+import { CaptchaService } from '@midwayjs/captcha';
 
 @Provide()
 export default abstract class BaseController {
@@ -17,39 +17,41 @@ export default abstract class BaseController {
   redisService: RedisService;
   @Inject()
   utils: Utils;
+  @Inject()
+  captchaService: CaptchaService;
 
   @Inject()
   userService: UserService;
 
   /**
-   * @description: 创建token
+   * @description: 生成验证码图片
    */
-  async CreateToken(User: User, n = 1) {
-    const username = User.username;
-    const sk = this.utils.md5(
-      username + Date.now() + Math.ceil(Math.random() * 1000 + n)
-    );
-    this.redisService.set(
-      `SESSION:${sk}`,
-      JSON.stringify(User),
-      'EX',
-      60 * 60 * 24 * 1
-    );
-    return {
-      User,
-      sk,
-    };
+  async captcha(width: number = 120, height: number = 40) {
+    const { id, imageBase64 } = await this.captchaService.image({
+      width,
+      height,
+    });
+    return { id, imageBase64 };
   }
   /**
-   * @description: 获取token
+   * @description: 生成计算表达式验证码
    */
-  async GetToken(sk: string) {
-    let result = await this.redisService.get(`SESSION:${sk}`);
-    try {
-      result = JSON.parse(result);
-    } catch (error) {}
-    return result;
+  async captchaMath() {
+    const { id, imageBase64 } = await this.captchaService.formula();
+    return { id, imageBase64 };
   }
+  /**
+   * @description: 验证验证码
+   */
+  async verifyCaptcha(ctx: Context) {
+    const { id, answer } = ctx.request.body as any;
+    const passed: boolean = await this.captchaService.check(id, answer);
+    if (passed) {
+      return this.ok('验证成功');
+    }
+    return this.fail('验证码错误', RESCODE.VALIDATEFAIL);
+  }
+
   /**
    * 成功返回
    * @param data 返回数据

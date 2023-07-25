@@ -12,7 +12,21 @@ export default {
     },
   },
   cors: {
-    credentials: true,
+    credentials: false,
+  },
+  jsonp: {
+    limit: 100,
+    callback: 'jsonp',
+  },
+  bull: {
+    // 默认队列配置
+    defaultQueueOptions: {
+      redis: {
+        host: '127.0.0.1',
+        port: 6379,
+        password: '',
+      },
+    },
   },
   redis: {
     client: {
@@ -32,8 +46,50 @@ export default {
           user: '',
           pass: '',
         },
-        entities: ['src/entity/*{.ts,.js}'],
+        entities: ['entity/*{.ts,.js}'],
       },
+    },
+  },
+  validate: {
+    validationOptions: {
+      // 允许出现没有定义的字段
+      // allowUnknown: true,
+      // 剔除参数中的未定义字段
+      stripUnknown: true,
+    },
+  },
+  swagger: {
+    enable: true,
+    routerMap: true,
+    apiInfo: {
+      title: 'midwayjs-koa',
+      description: 'midwayjs-koa api doc',
+      version: '1.0.0',
+    },
+    schemes: ['http', 'https'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    enableSecurity: false,
+    enableValidate: true,
+  },
+  staticFile: {
+    dirs: {
+      default: {
+        // 自定义url前缀
+        prefix: '/admin/',
+        // 对应的静态文件目录
+        dir: 'public',
+        alias: {
+          '/': '/index.html',
+        },
+      },
+    },
+  },
+  captcha: {
+    default: {
+      width: 120,
+      height: 40,
+      noise: 2,
     },
   },
 } as MidwayConfig;
