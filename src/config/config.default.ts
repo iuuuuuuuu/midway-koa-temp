@@ -76,12 +76,12 @@ export default {
     dirs: {
       default: {
         // 自定义url前缀
-        prefix: '/admin/',
+        // prefix: '/static/admin/',
         // 对应的静态文件目录
-        dir: 'public',
-        alias: {
-          '/': '/index.html',
-        },
+        // dir: 'public',
+        // alias: {
+        //   '/': '/index.html',
+        // },
       },
     },
   },

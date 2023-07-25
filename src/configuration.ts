@@ -6,7 +6,8 @@ import { join } from 'path';
 import { DefaultErrorFilter } from './filter/default.filter';
 // import { NotFoundFilter } from './filter/notfound.filter';
 import { ValidateErrorFilter } from './filter/validate.filter';
-import { ReportMiddleware } from './middleware/report.middleware';
+import ReportMiddleware from './middleware/report.middleware';
+import AuthMiddleware from './middleware/auth.middleware';
 import * as crossDomain from '@midwayjs/cross-domain';
 import * as redis from '@midwayjs/redis';
 import * as typegoose from '@midwayjs/typegoose';
@@ -46,7 +47,7 @@ export class ContainerLifeCycle {
     const userService = await container.getAsync(UserService);
     userService.initUser();
     // add middleware
-    this.app.useMiddleware([ReportMiddleware]);
+    this.app.useMiddleware([ReportMiddleware, AuthMiddleware]);
     // add filter
     this.app.useFilter([
       // NotFoundFilter,
