@@ -6,6 +6,7 @@ import { RESCODE, RESMESSAGE } from '../constant/global';
 import Utils from '../common/utils';
 import UserService from '../service/user.service';
 import { CaptchaService } from '@midwayjs/captcha';
+import { HttpService } from '@midwayjs/axios';
 
 @Provide()
 export default abstract class BaseController {
@@ -13,6 +14,8 @@ export default abstract class BaseController {
   baseApp: IMidwayApplication;
   @Inject()
   ctx: Context;
+  @Inject()
+  httpService: HttpService;
   @Inject()
   redisService: RedisService;
   @Inject()
@@ -23,6 +26,20 @@ export default abstract class BaseController {
   @Inject()
   userService: UserService;
 
+  /**
+   * @description: 获取请求IP详细信息
+   */
+  async getIpInfo(ip: string) {
+    const { data } = (await this.httpService.get(
+      `https://qifu-api.baidubce.com/ip/geo/v1/district`,
+      {
+        params: {
+          ip,
+        },
+      }
+    )) as ipResponse;
+    return data;
+  }
   /**
    * @description: 生成验证码图片
    */

@@ -1,17 +1,13 @@
 import { Provide, Inject } from '@midwayjs/core';
 import * as Crypto from 'crypto';
 import { Context } from 'koa';
-import { HttpService } from '@midwayjs/axios';
 import { User } from '../entity/user';
 import { RedisService } from '@midwayjs/redis';
 
 @Provide()
 export default class Utils {
   @Inject()
-  httpService: HttpService;
-  @Inject()
   redisService: RedisService;
-  
 
   /**
    * @description: 创建token
@@ -43,17 +39,6 @@ export default class Utils {
     return result;
   }
 
-  async getIpInfo(ip: string) {
-    const { data } = (await this.httpService.get(
-      `https://qifu-api.baidubce.com/ip/geo/v1/district`,
-      {
-        params: {
-          ip,
-        },
-      }
-    )) as ipResponse;
-    return data;
-  }
   /**
    * 获取请求IP
    */
