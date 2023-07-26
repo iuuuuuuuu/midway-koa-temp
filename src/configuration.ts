@@ -18,6 +18,7 @@ import * as staticFile from '@midwayjs/static-file';
 import * as captcha from '@midwayjs/captcha';
 import UserService from './service/user.service';
 
+const RateLimit = require('koa2-ratelimit').RateLimit;
 @Configuration({
   // 启用类名冲突检查
   conflictCheck: true,
@@ -54,5 +55,15 @@ export class ContainerLifeCycle {
       DefaultErrorFilter,
       ValidateErrorFilter,
     ]);
+    // 限流
+    this.app.use(
+      RateLimit.middleware({
+        interval: { min: 1 }, // 15 minutes = 15*60*1000
+        max: 100, // limit each IP to 100 requests per interval
+        timeWait: 3 * 1000,
+        message: '请求过于频繁',
+        messageKey: 'message',
+      })
+    );
   }
 }

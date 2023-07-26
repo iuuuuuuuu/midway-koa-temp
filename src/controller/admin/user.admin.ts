@@ -5,7 +5,7 @@ import { UserDTO } from '../../dto/user.dto';
 import { Validate } from '@midwayjs/validate';
 
 @Controller('/admin')
-export class UserController extends BaseController {
+export class adminUserController extends BaseController {
   @Get('/user')
   @UseGuard(AuthGuard)
   async home() {
