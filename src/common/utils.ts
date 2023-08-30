@@ -1,42 +1,70 @@
 import { Provide, Inject } from '@midwayjs/core';
 import * as Crypto from 'crypto';
 import { Context } from 'koa';
-import { User } from '../entity/user';
 import { RedisService } from '@midwayjs/redis';
+import { JwtService } from '@midwayjs/jwt/dist';
 
 @Provide()
 export default class Utils {
   @Inject()
   redisService: RedisService;
+  @Inject()
+  jwtService: JwtService;
+
+  getDeviceType(ctx: Context): DeviceType {
+    const userAgent = ctx.request.headers['user-agent'] || '';
+    if (/mobile/i.test(userAgent)) {
+      return 'mobile';
+    } else if (/iPad|iPhone|iPod/.test(userAgent)) {
+      return 'ios';
+    } else if (/Android/.test(userAgent)) {
+      return 'android';
+    } else if (/Tablet/i.test(userAgent)) {
+      return 'tablet';
+    } else {
+      return 'desktop';
+    }
+  }
 
   /**
-   * @description: 创建token
+   * @description: 创建jwt
    */
-  async CreateToken(User: User, n = 1) {
-    const username = User.username;
-    const sk = this.md5(
-      username + Date.now() + Math.ceil(Math.random() * 1000 + n)
-    );
-    this.redisService.set(
-      `SESSION:${sk}`,
-      JSON.stringify(User),
-      'EX',
-      60 * 60 * 24 * 1
-    );
-    return {
-      User,
-      sk,
-    };
+  async jwtSign(sign: any, options?: any) {
+    if (typeof sign == 'object' && sign.toObject) {
+      sign = sign.toObject();
+    }
+    return this.jwtService.sign(sign, options);
   }
   /**
-   * @description: 获取token
+   * @description: 获验证jwt
    */
-  async GetToken(sk: string) {
-    let result = await this.redisService.get(`SESSION:${sk}`);
+  async jwtVerify<T>(sk: string): Promise<T> {
+    return (await this.jwtService.verify(sk)) as T;
+  }
+  /**
+   * @description: 获取解密后的jwt
+   */
+  async jwtDecode(sk: string) {
+    return this.jwtService.decode(sk);
+  }
+  /**
+   * @description: 存 redis
+   */
+  async setRedis(key: string, value: any) {
+    this.redisService.set(key, JSON.stringify(value), 'EX', 60 * 60 * 24 * 7);
+  }
+  /**
+   * @description: 取 redis
+   */
+  async getRedis<T>(key: string): Promise<T> {
+    let data = await this.redisService.get(key);
     try {
-      result = JSON.parse(result);
-    } catch (error) {}
-    return result;
+      data = JSON.parse(data);
+    } catch (_e) {}
+    return data as T;
+  }
+  async delRedis(key: string) {
+    return this.redisService.del(key);
   }
 
   /**
@@ -51,7 +79,8 @@ export default class Utils {
       req.connection.socket.remoteAddress
     ).replace('::ffff:', '');
   }
-  md5(str: string) {
+  md5(str: string, adTime = false) {
+    adTime ? (str += Date.now()) : str;
     const sk = Crypto.createHash('md5').update(str).digest('hex');
     return sk;
   }

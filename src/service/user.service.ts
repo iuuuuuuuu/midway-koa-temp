@@ -17,7 +17,7 @@ export default class UserService extends BaseService {
   add(params: User): Promise<User> {
     return this.userModel.create(params);
   }
-  async find(map: any = {}): Promise<User | undefined> {
+  async find(map: any = {}) {
     return await this.userModel.findOne(map).select('-password').exec();
   }
   async finds(

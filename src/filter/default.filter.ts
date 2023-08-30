@@ -6,9 +6,9 @@ import { RESCODE } from '../constant/global';
 export class DefaultErrorFilter {
   async catch(err: Error, ctx: Context) {
     // 所有的未分类错误会到这里
-    console.error(`Error 名字:${err.name}`);
     let code = transformError(err);
     code = code ? code : RESCODE.COMMFAIL;
+    console.error(`${code ? '已收录' : '未收录'} :${err.name} ${err.message}`);
     ctx.status = code;
     return {
       code: code,
@@ -22,6 +22,10 @@ const transformError = (error: Error) => {
     case 'ValidationError': {
       return 414;
     }
+    case 'TokenExpiredError': {
+      return 900;
+    }
+    case 'JsonWebTokenError':
     case 'UnauthorizedError': {
       return 401;
     }
@@ -52,6 +56,7 @@ const transformError = (error: Error) => {
     case 'TooManyRequestsError': {
       return 429;
     }
+
     default: {
       return false;
     }

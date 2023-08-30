@@ -1,14 +1,13 @@
 import { prop } from '@typegoose/typegoose';
 
-export default abstract class BaseEntity {
+export default class baseEntity {
   @prop({
     default: Date.now(),
-    timestamp: true,
   })
-  updateTime?: Date;
+  updatedAt?: number;
 
   @prop({
     default: Date.now(),
   })
-  createTime?: Date;
+  createdTime?: number;
 }

@@ -34,12 +34,13 @@ export default {
       host: '127.0.0.1',
       password: '',
       db: 0,
+      expire: 60 * 60 * 24 * 3,
     },
   },
   mongoose: {
     dataSource: {
       default: {
-        uri: 'mongodb://localhost:27017/test',
+        uri: 'mongodb://127.0.0.1:27017/sakura-midway',
         options: {
           useNewUrlParser: true,
           useUnifiedTopology: true,
@@ -91,5 +92,14 @@ export default {
       height: 40,
       noise: 2,
     },
+  },
+  jwt: {
+    secret: 'midway-koa+klhsdaklhgalksjd@!#^&%*#$%skdaj',
+    // expiresIn: 60 * 60 * 2,
+    expiresIn: 15,
+  },
+  i18n: {
+    defaultLocale: 'zh-CN',
+    localeTable: {},
   },
 } as MidwayConfig;

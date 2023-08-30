@@ -1,5 +1,5 @@
 import { App, Inject, Provide } from '@midwayjs/decorator';
-import { IMidwayApplication } from '@midwayjs/core';
+import { IMidwayApplication, Config, ALL } from '@midwayjs/core';
 import { RedisService } from '@midwayjs/redis';
 import { Context } from '@midwayjs/koa';
 import { RESCODE, RESMESSAGE } from '../constant/global';
@@ -22,9 +22,34 @@ export default abstract class BaseController {
   utils: Utils;
   @Inject()
   captchaService: CaptchaService;
-
   @Inject()
   userService: UserService;
+
+  @Config(ALL)
+  allConfig;
+
+  async createToken(ctx: Context, id: string, options?: any) {
+    let expiresIn = this.allConfig.jwt.expiresIn;
+    if (options && options.expiresIn) {
+      expiresIn = options.expiresIn;
+    }
+    const refreshToken = this.utils.md5(this.utils.getDeviceType(ctx) + id);
+    await this.utils.delRedis(refreshToken);
+    const user = await this.userService.find({
+      _id: id,
+    });
+    const token = await this.utils.jwtSign(user, options);
+    // 删除对应的refreshToken
+    await this.utils.setRedis(refreshToken, {
+      token,
+      user,
+    });
+    return {
+      token,
+      expiresIn,
+      refreshToken,
+    };
+  }
 
   /**
    * @description: 获取请求IP详细信息

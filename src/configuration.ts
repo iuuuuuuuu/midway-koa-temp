@@ -8,6 +8,7 @@ import { DefaultErrorFilter } from './filter/default.filter';
 import { ValidateErrorFilter } from './filter/validate.filter';
 import ReportMiddleware from './middleware/report.middleware';
 import AuthMiddleware from './middleware/auth.middleware';
+// import LimitMiddleware from './middleware/limit.middleware';
 import * as crossDomain from '@midwayjs/cross-domain';
 import * as redis from '@midwayjs/redis';
 import * as typegoose from '@midwayjs/typegoose';
@@ -16,23 +17,26 @@ import * as swagger from '@midwayjs/swagger';
 import * as bull from '@midwayjs/bull';
 import * as staticFile from '@midwayjs/static-file';
 import * as captcha from '@midwayjs/captcha';
+import * as jwt from '@midwayjs/jwt';
 import UserService from './service/user.service';
 
 const RateLimit = require('koa2-ratelimit').RateLimit;
+
 @Configuration({
   // 启用类名冲突检查
   conflictCheck: true,
   imports: [
+    typegoose,
+    redis,
     koa,
     validate,
     crossDomain,
-    redis,
     axios,
     swagger,
-    typegoose,
     bull,
     staticFile,
     captcha,
+    jwt,
     {
       component: info,
       enabledEnvironment: ['local'],
@@ -48,14 +52,18 @@ export class ContainerLifeCycle {
     const userService = await container.getAsync(UserService);
     userService.initUser();
     // add middleware
-    this.app.useMiddleware([ReportMiddleware, AuthMiddleware]);
+    this.app.useMiddleware([
+      ReportMiddleware,
+      AuthMiddleware,
+      // LimitMiddleware
+    ]);
     // add filter
     this.app.useFilter([
       // NotFoundFilter,
       DefaultErrorFilter,
       ValidateErrorFilter,
     ]);
-    // 限流
+
     this.app.use(
       RateLimit.middleware({
         interval: { min: 1 }, // 15 minutes = 15*60*1000
