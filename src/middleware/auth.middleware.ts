@@ -59,13 +59,11 @@ export default class AuthMiddleware
   public match(ctx: Context): boolean {
     const ignore = [
       '/',
-      '/client/user/login',
-      '/client/user/register',
+      '/admin/user/test',
       '/admin/user/register',
       '/admin/user/login',
-      '/admin/user/test',
-      '/client/version',
-      '/client/record',
+      '/client/user/login',
+      '/client/user/register',
     ];
     const is = !ignore.includes(ctx.path);
     if (is) console.log('ignore', ctx.path);
