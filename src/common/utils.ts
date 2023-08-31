@@ -1,8 +1,9 @@
-import { Provide, Inject } from '@midwayjs/core';
+import { Provide, Inject, makeHttpRequest } from '@midwayjs/core';
 import * as Crypto from 'crypto';
 import { Context } from 'koa';
 import { RedisService } from '@midwayjs/redis';
 import { JwtService } from '@midwayjs/jwt/dist';
+type IOptions = Parameters<typeof makeHttpRequest>[1];
 
 @Provide()
 export default class Utils {
@@ -105,5 +106,14 @@ export default class Utils {
     adTime ? (str += Date.now()) : str;
     const sk = Crypto.createHash('md5').update(str).digest('hex');
     return sk;
+  }
+
+  /**
+   * @description: 简易请求封装
+   */
+  async request<T>(url: string, options?: IOptions): Promise<T> {
+    options.timeout = 1000 * 15;
+    const res = await makeHttpRequest(url, options);
+    return res.data as T;
   }
 }
