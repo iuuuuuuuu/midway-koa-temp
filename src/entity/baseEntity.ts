@@ -9,5 +9,5 @@ export default class baseEntity {
   @prop({
     default: Date.now(),
   })
-  createdTime?: number;
+  createdAt?: number;
 }
