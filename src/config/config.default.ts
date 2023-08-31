@@ -95,8 +95,7 @@ export default {
   },
   jwt: {
     secret: 'midway-koa+klhsdaklhgalksjd@!#^&%*#$%skdaj',
-    // expiresIn: 60 * 60 * 2,
-    expiresIn: 15,
+    expiresIn: 60 * 30,
   },
   i18n: {
     defaultLocale: 'zh-CN',
