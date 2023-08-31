@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@midwayjs/core';
 import BaseController from '../base.controller';
 import { UserDTO, UserEditPsdDto } from '../../dto/user.dto';
 import { Validate } from '@midwayjs/validate';
+import { PLATFORM } from '../../constant/global';
 
 @Controller('/admin/user')
 export class UserAdminController extends BaseController {
@@ -72,6 +73,14 @@ export class UserAdminController extends BaseController {
     if (user) {
       await this.userService.update({
         password: newPassword,
+      });
+      // 删除对应的refreshToken 全部失效
+      PLATFORM.map(key => {
+        try {
+          this.utils.delRedis(this.utils.md5(key + user._id));
+        } catch (error: any) {
+          console.log('删除refreshToken失败', error.message);
+        }
       });
       return this.ok('修改成功');
     } else {
