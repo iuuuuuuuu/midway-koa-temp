@@ -47,9 +47,6 @@ export class UserAdminController extends BaseController {
       return this.fail(msg, 501);
     }
     const jwtToken = this.ctx.jwtToken;
-    if (!jwtToken) {
-      return this.ok('token还未过期!');
-    }
     const { token: redisJwtToken, user } = redisData;
     if (jwtToken == redisJwtToken) {
       return this.ok(await this.createToken(this.ctx, user._id));

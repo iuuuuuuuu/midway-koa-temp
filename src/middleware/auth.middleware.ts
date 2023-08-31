@@ -36,6 +36,8 @@ export default class AuthMiddleware
       }
       const [scheme, token] = parts;
       if (/^Bearer$/i.test(scheme) && token) {
+        // 挂载jwtToken
+        ctx.jwtToken = token;
         try {
           let user = await this.utils.jwtVerify<UserDTO>(token);
           ctx.user = await this.userService.find({
@@ -44,7 +46,6 @@ export default class AuthMiddleware
           await next();
         } catch (error: any) {
           if (error.message == 'jwt expired') {
-            ctx.jwtToken = token;
             await next();
           } else {
             throw new httpError.UnauthorizedError(error.message);
