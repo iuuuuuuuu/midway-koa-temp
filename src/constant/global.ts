@@ -50,3 +50,14 @@ export enum EVENT {
   // ES 数据改变
   ES_DATA_CHANGE = 'esDataChange',
 }
+
+/**
+ * @description: 登录平台
+ */
+export const PLATFORM: DeviceType[] = [
+  'mobile',
+  'tablet',
+  'desktop',
+  'ios',
+  'android',
+];

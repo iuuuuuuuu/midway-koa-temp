@@ -7,6 +7,8 @@ import { Validate } from '@midwayjs/validate';
 export class UserAdminController extends BaseController {
   @Get('/test')
   async home() {
+    console.log();
+
     return this.ok('Hello user!');
   }
 
@@ -31,7 +33,10 @@ export class UserAdminController extends BaseController {
   }
   @Post('/updateToken')
   async updateToken(@Body() body: { refreshToken: string }) {
-    const msg = '账号已在其他平台登录,当前平台账号登录已失效.';
+    const device = this.utils.getDeviceTypeCN(
+      this.utils.getDeviceType(this.ctx)
+    );
+    const msg = `账号已在其他 ${device} 登录,当前账号登录已失效.`;
     const { refreshToken } = body;
     const redisData = await this.utils.getRedis<{
       token: string;

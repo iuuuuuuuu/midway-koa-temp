@@ -11,6 +11,9 @@ export default class Utils {
   @Inject()
   jwtService: JwtService;
 
+  /**
+   * @description: 通过请求头获取设备类型
+   */
   getDeviceType(ctx: Context): DeviceType {
     const userAgent = ctx.request.headers['user-agent'] || '';
     if (/mobile/i.test(userAgent)) {
@@ -23,6 +26,25 @@ export default class Utils {
       return 'tablet';
     } else {
       return 'desktop';
+    }
+  }
+  /**
+   * @description: 把设备类型转换成中文
+   */
+  getDeviceTypeCN(type: DeviceType): string {
+    switch (type) {
+      case 'mobile':
+        return '手机';
+      case 'ios':
+        return '苹果';
+      case 'android':
+        return '安卓';
+      case 'tablet':
+        return '平板';
+      case 'desktop':
+        return '电脑';
+      default:
+        return '未知';
     }
   }
 
