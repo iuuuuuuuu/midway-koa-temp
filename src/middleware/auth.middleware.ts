@@ -45,7 +45,10 @@ export default class AuthMiddleware
           });
           await next();
         } catch (error: any) {
-          if (error.message == 'jwt expired') {
+          const exludeUrl = ['/client/user/updateToken', '/admin/user/updateToken'];
+          const url = ctx.path.slice(0, ctx.path.lastIndexOf('?'));
+          console.log('url', url, error.message)
+          if (error.message == 'jwt expired' && exludeUrl.includes(url)) {
             await next();
           } else {
             throw new httpError.UnauthorizedError(error.message);
@@ -60,14 +63,24 @@ export default class AuthMiddleware
   public match(ctx: Context): boolean {
     const ignore = [
       '/',
-      '/admin/user/test',
-      '/admin/user/register',
-      '/admin/user/login',
+      '/public',
       '/client/user/login',
       '/client/user/register',
+      '/admin/user/register',
+      '/admin/user/login',
+
+      '/client/api/*',
     ];
     const is = !ignore.includes(ctx.path);
     if (is) console.log('ignore', ctx.path);
+    // 截取最后 1 位
+    const requestPath = ctx.path;
+    // 把最后一个 / 之后的内容删除
+    const path = requestPath.substr(0, requestPath.lastIndexOf('/')) + '/*';
+    // 如果是 /client/api/* 之类的
+    if (ignore.includes(path)) {
+      return false;
+    }
     return is;
   }
 }
