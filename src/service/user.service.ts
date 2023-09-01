@@ -27,16 +27,19 @@ export default class UserService extends BaseService {
     sort: any = {
       _id: -1,
     }
-  ): Promise<User[]> {
-    return await this.userModel
-      .find(map)
-      .select('-password')
-      .skip(skip)
-      .limit(limit)
-      .sort({
-        ...sort,
-      })
-      .exec();
+  ) {
+    return {
+      list: await this.userModel
+        .find(map)
+        .select('-password')
+        .skip(skip)
+        .limit(limit)
+        .sort({
+          ...sort,
+        })
+        .exec(),
+      total: await this.count(map),
+    }
   }
   async delete(map: any): Promise<boolean> {
     const { _id } = map;
@@ -48,7 +51,7 @@ export default class UserService extends BaseService {
       return acknowledged;
     }
   }
-  async update(map: any, params?: User): Promise<boolean> {
+  async update(map: any, params: any): Promise<boolean> {
     const { _id } = map;
     if (_id) {
       const { acknowledged } = await this.userModel

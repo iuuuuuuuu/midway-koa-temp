@@ -1,5 +1,5 @@
 import { App, Inject, Provide } from '@midwayjs/decorator';
-import { IMidwayApplication, Config, ALL } from '@midwayjs/core';
+import { IMidwayApplication, Config, ALL, } from '@midwayjs/core';
 import { RedisService } from '@midwayjs/redis';
 import { Context } from '@midwayjs/koa';
 import { RESCODE, RESMESSAGE } from '../constant/global';
@@ -119,8 +119,8 @@ export default abstract class BaseController {
       message: message
         ? message
         : code == RESCODE.VALIDATEFAIL
-        ? RESMESSAGE.VALIDATEFAIL
-        : RESMESSAGE.COMMFAIL,
+          ? RESMESSAGE.VALIDATEFAIL
+          : RESMESSAGE.COMMFAIL,
     };
   }
 }

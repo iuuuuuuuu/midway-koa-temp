@@ -8,8 +8,6 @@ import { PLATFORM } from '../../constant/global';
 export class UserAdminController extends BaseController {
   @Get('/test')
   async home() {
-    console.log();
-
     return this.ok('Hello user!');
   }
 
@@ -69,6 +67,8 @@ export class UserAdminController extends BaseController {
     });
     if (user) {
       await this.userService.update({
+        _id: user._id
+      }, {
         password: newPassword,
       });
       // 删除对应的refreshToken 全部失效

@@ -68,6 +68,7 @@ export default class AuthMiddleware
       '/client/user/register',
       '/admin/user/register',
       '/admin/user/login',
+      '/admin/user/test',
 
       '/client/api/*',
     ];
