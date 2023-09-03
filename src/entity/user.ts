@@ -13,7 +13,7 @@ export class User extends BaseEntity {
   @prop({
     required: true,
     set(val) {
-      return utils.md5(val);
+      return utils.sha256(val);
     },
   })
   public password: string;

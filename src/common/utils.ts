@@ -83,7 +83,7 @@ export default class Utils {
     let data = await this.redisService.get(key);
     try {
       data = JSON.parse(data);
-    } catch (_e) {}
+    } catch (_e) { }
     return data as T;
   }
   async delRedis(key: string) {
@@ -103,9 +103,15 @@ export default class Utils {
     ).replace('::ffff:', '');
   }
   md5(str: string, adTime = false) {
-    adTime ? (str += Date.now()) : str;
-    const sk = Crypto.createHash('md5').update(str).digest('hex');
-    return sk;
+    return this.encrypt('md5', str, adTime);
+  }
+  sha256(str: string, adTime = false) {
+    return this.encrypt('sha256', str, adTime);
+  }
+  // 加密
+  encrypt(type: 'md5' | 'sha256', str: string, addTime = false) {
+    addTime ? (str += Date.now()) : str;
+    return Crypto.createHash(type).update(str).digest('hex');
   }
 
   /**
