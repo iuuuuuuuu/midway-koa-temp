@@ -50,7 +50,10 @@ export class UserAdminController extends BaseController {
     const jwtToken = this.ctx.jwtToken;
     const { token: redisJwtToken, user } = redisData;
     if (jwtToken == redisJwtToken) {
-      return this.ok(await this.createToken(this.ctx, user._id));
+      return this.ok({
+        ...await this.createToken(this.ctx, user._id.toString()),
+        userInfo: await this.userService.find({ _id: user._id }),
+      });
     } else {
       return this.fail(msg, 501);
     }
