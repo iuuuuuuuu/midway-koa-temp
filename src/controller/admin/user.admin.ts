@@ -25,7 +25,10 @@ export class UserAdminController extends BaseController {
       password,
     });
     if (user) {
-      return this.ok(await this.createToken(this.ctx, user._id.toString()));
+      return this.ok({
+        ...await this.createToken(this.ctx, user._id.toString()),
+        userInfo: user,
+      });
     } else {
       return this.fail('用户名或密码错误');
     }
